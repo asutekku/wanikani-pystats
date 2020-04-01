@@ -12,9 +12,12 @@ path_reviews = 'reviews.csv'
 path_subjects = 'subjects.csv'
 path_daystats = 'daystats.csv'
 
+# File settings
+
+
 # Param values
 update_after = "1970-01-01T00:00:00.000Z"
-api_V2 = ""
+api_V2 = "ca2af12e-f0d9-4d15-aa3a-3baa162cdd3f"
 
 # defining a params dict for the parameters to be sent to the API
 PARAMS = {'update_after': update_after}
@@ -44,30 +47,35 @@ def is_empty(file_name):
         return False
 
 
-def cache_subjects():
+def cache_subjects(subject_url):
     with open(path_subjects, 'w', newline='', encoding="utf-8") as csvfile:
         fieldnames = ['subject_id', 'subject_level',
                       'subject_type', 'characters']
         writer = csv.DictWriter(csvfile, delimiter=';', fieldnames=fieldnames)
         writer.writeheader()
+    url = url_subjects
+    total = 0
+    retrieved = 0
     while True:
-        r = requests.get(url=url_subjects, params=PARAMS, headers=HEADERS)
+        r = requests.get(url=url, params=PARAMS, headers=HEADERS)
         data = r.json()
         for entry in data['data']:
             subject_id = entry['id']
             subject_type = entry['object']
             subject_level = entry['data']['level']
             characters = entry['data']['characters']
-            OBJECTS[subject_id] = {
+            OBJECTS[str(subject_id)] = {
                 'level': subject_level,
                 'subject_type': subject_type,
                 'characters': characters
             }
             SUBJECTS.write(
                 f'{subject_id};{subject_level};{subject_type};{characters}\n')
-        URL_SUBJECTS = data['pages']['next_url']
-        print(f'Current subject request completed, requesting {URL_SUBJECTS}')
-        if (URL_SUBJECTS is None):
+        url = data['pages']['next_url']
+        total = data['total_count']
+        retrieved += len(data['data'])
+        print(f'{str(round(retrieved/total,2)*100)}% done. Retrieving {url}')
+        if (url is None):
             break
 
 
@@ -75,7 +83,7 @@ def load_subjects():
     with open(path_subjects, 'r', newline='', encoding="utf-8") as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=';', quotechar='|')
         for row in csvreader:
-            OBJECTS[row['subject_id']] = {
+            OBJECTS[str(row['subject_id'])] = {
                 'level': row['subject_level'],
                 'subject_type': row['subject_type'],
                 'characters': row['characters']
@@ -83,10 +91,10 @@ def load_subjects():
 
 
 # If subjects are not cached, they will be downloaded from the API
-def get_subjects():
-    if is_empty(path_subjects):
+def get_subjects(get_type):
+    if is_empty(path_subjects) or get_type == "download":
         print(f"Subjects not cached. Initializing file.")
-        cache_subjects()
+        cache_subjects(url_subjects)
     else:
         print(f"Subjects cached. Reading file.")
         load_subjects()
@@ -208,8 +216,10 @@ def get_reviews(review_path, api_url):
             date = datetime.strptime(created_at, "%Y-%m-%d").date()
 
             # Retrieve the subject type and level from the cached subjects
+            #print(OBJECTS[subject_id])
             subject_type = OBJECTS[subject_id]['subject_type']
             subject_level = int(OBJECTS[subject_id]['level'])
+            
 
             # The first day is not initialized so this is set on the first run
             if (not CurrentDay):
@@ -326,11 +336,17 @@ def get_reviews(review_path, api_url):
             write_dayrow()
             break
 
+def load_files(load_type):
+    get_subjects(load_type)
+    try:
+        get_reviews(path_reviews, url_review)
+    except KeyError:
+        print(f"Error reading the subjects, redownloading from the server.")
+        load_files("download")
 
 if __name__ == "__main__":
     start = time.time()
-    get_subjects()
-    get_reviews(path_reviews, url_review)
+    load_files("initial")
     end = time.time()
     print(f'Done!')
     print(f'Time elapsed: {str(round(end - start,2))}s')
