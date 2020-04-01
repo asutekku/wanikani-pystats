@@ -18,7 +18,8 @@ api_V2 = ""
 
 # defining a params dict for the parameters to be sent to the API
 PARAMS = {'update_after': update_after}
-HEADERS = {'Wanikani-Revision': '20170710', 'Authorization': f"Bearer {api_V2}"}
+HEADERS = {'Wanikani-Revision': '20170710',
+           'Authorization': f"Bearer {api_V2}"}
 
 SUBJECTS = open(path_subjects, "a", encoding="utf-8")
 DAYSTATFILE = open(path_daystats, "w", encoding="utf-8")
@@ -45,7 +46,8 @@ def is_empty(file_name):
 
 def cache_subjects():
     with open(path_subjects, 'w', newline='', encoding="utf-8") as csvfile:
-        fieldnames = ['subject_id', 'subject_level', 'subject_type', 'characters']
+        fieldnames = ['subject_id', 'subject_level',
+                      'subject_type', 'characters']
         writer = csv.DictWriter(csvfile, delimiter=';', fieldnames=fieldnames)
         writer.writeheader()
     while True:
@@ -56,8 +58,13 @@ def cache_subjects():
             subject_type = entry['object']
             subject_level = entry['data']['level']
             characters = entry['data']['characters']
-            OBJECTS[subject_id] = {'level': subject_level, 'subject_type': subject_type, 'characters': characters}
-            SUBJECTS.write(f'{subject_id};{subject_level};{subject_type};{characters}\n')
+            OBJECTS[subject_id] = {
+                'level': subject_level,
+                'subject_type': subject_type,
+                'characters': characters
+            }
+            SUBJECTS.write(
+                f'{subject_id};{subject_level};{subject_type};{characters}\n')
         URL_SUBJECTS = data['pages']['next_url']
         print(f'Current subject request completed, requesting {URL_SUBJECTS}')
         if (URL_SUBJECTS is None):
@@ -68,10 +75,14 @@ def load_subjects():
     with open(path_subjects, 'r', newline='', encoding="utf-8") as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=';', quotechar='|')
         for row in csvreader:
-            OBJECTS[row['subject_id']] = {'level': row['subject_level'], 'subject_type': row['subject_type'], 'characters': row['characters']}
+            OBJECTS[row['subject_id']] = {
+                'level': row['subject_level'],
+                'subject_type': row['subject_type'],
+                'characters': row['characters']
+            }
 
 
-## If subjects are not cached, they will be downloaded from the API
+# If subjects are not cached, they will be downloaded from the API
 def get_subjects():
     if is_empty(path_subjects):
         print(f"Subjects not cached. Initializing file.")
@@ -112,9 +123,10 @@ def get_reviews(review_path, api_url):
     vocab_accuracy = 100
     vocab_guruplus = 0
 
-    f = open(review_path, "w")
+    # Uncomment these if you want to write reviews to a file
+    #f = open(review_path, "w")
     # Write the header
-    f.write(f'subject_id;subject_type;created_at;starting_srs_stage;starting_srs_stage_name;ending_srs_stage;ending_srs_stage_name;incorrect_meaning_answers;incorrect_reading_answers\n')
+    # f.write(f'subject_id;subject_type;created_at;starting_srs_stage;starting_srs_stage_name;ending_srs_stage;ending_srs_stage_name;incorrect_meaning_answers;incorrect_reading_answers\n')
 
     URL = api_url
 
@@ -125,12 +137,17 @@ def get_reviews(review_path, api_url):
         return 0 if not total else correct / total
 
     def write_dayrow():
-        total_active = DAYSTATS[1] + DAYSTATS[2] + DAYSTATS[3] + DAYSTATS[4] + DAYSTATS[5] + DAYSTATS[6] + DAYSTATS[7] + DAYSTATS[8]
+        total_active = DAYSTATS[1] + DAYSTATS[2] + DAYSTATS[3] + \
+            DAYSTATS[4] + DAYSTATS[5] + DAYSTATS[6] + DAYSTATS[7] + DAYSTATS[8]
 
-        kanji_reading_acc = get_accuracy(kanji_reading_correct, kanji_reading_incorrect)
-        kanji_meaning_acc = get_accuracy(kanji_meaning_correct, kanji_meaning_incorrect)
-        vocab_reading_acc = get_accuracy(vocab_reading_correct, vocab_reading_incorrect)
-        vocab_meaning_acc = get_accuracy(vocab_meaning_correct, vocab_meaning_incorrect)
+        kanji_reading_acc = get_accuracy(
+            kanji_reading_correct, kanji_reading_incorrect)
+        kanji_meaning_acc = get_accuracy(
+            kanji_meaning_correct, kanji_meaning_incorrect)
+        vocab_reading_acc = get_accuracy(
+            vocab_reading_correct, vocab_reading_incorrect)
+        vocab_meaning_acc = get_accuracy(
+            vocab_meaning_correct, vocab_meaning_incorrect)
 
         daystatsrows = {
             'date': str(CurrentDay),
@@ -167,7 +184,8 @@ def get_reviews(review_path, api_url):
         # Make sure the rows and headers are the same length
         # This is a debug check or if you add your own rows & Headers
         if (len(DAYSTATSHEADERS) != len(daystatsrows)):
-            raise Exception(f'Length of Daystats headers and daystats rows does not match: {len(daystatsrows)} & {len(DAYSTATSHEADERS)}')
+            raise Exception(
+                f'Length of Daystats headers and daystats rows does not match: {len(daystatsrows)} & {len(DAYSTATSHEADERS)}')
         daystring = ';'.join(str(x) for x in daystatsrows.values())
         DAYSTATFILE.write(f'{daystring}\n')
 
@@ -206,7 +224,8 @@ def get_reviews(review_path, api_url):
                 daily_reviews = 0
 
             meaning_correct = 1 if incorrect_meaning_answers == 0 else 0
-            reading_correct = 0 if subject_type == 'radical' else (1 if incorrect_reading_answers == 0 else 0)
+            reading_correct = 0 if subject_type == 'radical' else (
+                1 if incorrect_reading_answers == 0 else 0)
 
             # Calculate radical accuracies and update total and daily review counts
             if (subject_type == 'radical'):
@@ -239,7 +258,8 @@ def get_reviews(review_path, api_url):
                     vocab_guruplus -= 1
 
             # Update the amount of items in specific level
-            DAYSTATS[starting_srs_stage] = DAYSTATS[starting_srs_stage] - 1 if DAYSTATS[starting_srs_stage] >= 1 else 0
+            DAYSTATS[starting_srs_stage] = DAYSTATS[starting_srs_stage] - \
+                1 if DAYSTATS[starting_srs_stage] >= 1 else 0
             DAYSTATS[ending_srs_stage] += 1
 
             total_meaning_incorrect += incorrect_meaning_answers
@@ -248,8 +268,20 @@ def get_reviews(review_path, api_url):
             total_reading_correct += reading_correct
 
             total_radical_reviews = radical_meaning_correct + radical_meaning_incorrect
-            total_kanji_reviews = sum([kanji_meaning_correct, kanji_meaning_incorrect, kanji_reading_correct, kanji_reading_incorrect])
-            total_vocab_reviews = sum([vocab_meaning_correct, vocab_meaning_incorrect, vocab_reading_correct, vocab_reading_incorrect])
+            total_kanji_reviews = sum(
+                [
+                    kanji_meaning_correct,
+                    kanji_meaning_incorrect,
+                    kanji_reading_correct,
+                    kanji_reading_incorrect
+                ])
+            total_vocab_reviews = sum(
+                [
+                    vocab_meaning_correct,
+                    vocab_meaning_incorrect,
+                    vocab_reading_correct,
+                    vocab_reading_incorrect
+                ])
 
             total_correct = total_meaning_correct + total_reading_correct
             total_incorrect = total_meaning_incorrect + total_meaning_incorrect
@@ -258,12 +290,20 @@ def get_reviews(review_path, api_url):
             total_reading = (total_reading_correct + total_reading_incorrect)
             total_reviews = total_meaning + total_reading
 
+            total_kanji_correct = kanji_reading_correct + kanji_meaning_correct
+            total_vocab_correct = vocab_reading_correct + vocab_meaning_correct
+
             total_accuracy = get_accuracy_total(total_correct, total_reviews)
-            radical_accuracy = get_accuracy_total(radical_meaning_correct, total_radical_reviews)
-            kanji_accuracy = get_accuracy_total(kanji_reading_correct + kanji_meaning_correct, total_kanji_reviews)
-            vocab_accuracy = get_accuracy_total(vocab_reading_correct + vocab_meaning_correct, total_vocab_reviews)
-            meaning_accuracy = get_accuracy_total(total_meaning_correct, total_meaning_correct + total_meaning_incorrect)
-            reading_accuracy = get_accuracy_total(total_reading_correct, total_reading_correct + total_reading_incorrect)
+            radical_accuracy = get_accuracy_total(
+                radical_meaning_correct, total_radical_reviews)
+            kanji_accuracy = get_accuracy_total(
+                total_kanji_correct, total_kanji_reviews)
+            vocab_accuracy = get_accuracy_total(
+                total_vocab_correct, total_vocab_reviews)
+            meaning_accuracy = get_accuracy_total(
+                total_meaning_correct, total_meaning)
+            reading_accuracy = get_accuracy_total(
+                total_reading_correct, total_reading)
 
             total_answers += (total_reading + total_meaning)
             total_reviews += (total_correct + total_incorrect)
@@ -276,10 +316,11 @@ def get_reviews(review_path, api_url):
                 char = OBJECTS[subject_id]['characters']
 
             # If you want to have reviews in an csv format, uncomment the following line.
-            #f.write(f'{subject_id};{subject_type};{created_at};{starting_srs_stage};{starting_srs_stage_name};{ending_srs_stage};{ending_srs_stage_name};{incorrect_meaning_answers};{incorrect_reading_answers}\n')
+            # f.write(f'{subject_id};{subject_type};{created_at};{starting_srs_stage};{starting_srs_stage_name};{ending_srs_stage};{ending_srs_stage_name};{incorrect_meaning_answers};{incorrect_reading_answers}\n')
             checked += 1
         URL = data['pages']['next_url']
-        print(f'{str(round((checked / total_count),2)*100)}% completed. Requesting {URL}')
+        print(
+            f'{str(round((checked / total_count),2)*100)}% completed. Requesting {URL}')
         if (URL is None):
             # Write the last row
             write_dayrow()
