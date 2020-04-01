@@ -17,7 +17,7 @@ path_daystats = 'daystats.csv'
 
 # Param values
 update_after = "1970-01-01T00:00:00.000Z"
-api_V2 = "ca2af12e-f0d9-4d15-aa3a-3baa162cdd3f"
+api_V2 = ""
 
 # defining a params dict for the parameters to be sent to the API
 PARAMS = {'update_after': update_after}
