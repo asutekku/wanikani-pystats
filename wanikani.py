@@ -307,16 +307,11 @@ def get_reviews(review_path, api_url):
             total_vocab_correct = vocab_reading_correct + vocab_meaning_correct
 
             total_accuracy = get_accuracy_total(total_correct, total_reviews)
-            radical_accuracy = get_accuracy_total(
-                radical_meaning_correct, total_radical_reviews)
-            kanji_accuracy = get_accuracy_total(
-                total_kanji_correct, total_kanji_reviews)
-            vocab_accuracy = get_accuracy_total(
-                total_vocab_correct, total_vocab_reviews)
-            meaning_accuracy = get_accuracy_total(
-                total_meaning_correct, total_meaning)
-            reading_accuracy = get_accuracy_total(
-                total_reading_correct, total_reading)
+            radical_accuracy = get_accuracy_total(radical_meaning_correct, total_radical_reviews)
+            kanji_accuracy = get_accuracy_total(total_kanji_correct, total_kanji_reviews)
+            vocab_accuracy = get_accuracy_total(total_vocab_correct, total_vocab_reviews)
+            meaning_accuracy = get_accuracy_total(total_meaning_correct, total_meaning)
+            reading_accuracy = get_accuracy_total(total_reading_correct, total_reading)
 
             total_answers += (total_reading + total_meaning)
             total_reviews += (total_correct + total_incorrect)
