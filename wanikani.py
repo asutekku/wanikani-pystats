@@ -74,7 +74,10 @@ def cache_subjects(subject_url):
         url = data['pages']['next_url']
         total = data['total_count']
         retrieved += len(data['data'])
-        print(f'{str(round(retrieved/total,2)*100)}% done. Retrieving {url}')
+        if url is not None:
+            print(f'{str(round(retrieved/total,2)*100)}% done. Retrieving {url}')
+        else:
+            print(f'{str(round(retrieved/total,2)*100)}% done.')
         if (url is None):
             break
 
