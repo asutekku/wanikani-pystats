@@ -2,6 +2,7 @@ import requests
 import time
 import csv
 from datetime import datetime, date
+import sys
 
 # api-endpoint
 url_review = "https://api.wanikani.com/v2/reviews"
@@ -112,6 +113,7 @@ def get_reviews(review_path, api_url):
     level = 1
     total_answers = 0
     daily_reviews = 0
+    total_reviews = 0
 
     reading_accuracy = 0
     total_reading = 0
@@ -297,11 +299,11 @@ def get_reviews(review_path, api_url):
                 ])
 
             total_correct = total_meaning_correct + total_reading_correct
-            total_incorrect = total_meaning_incorrect + total_meaning_incorrect
+            total_incorrect = total_meaning_incorrect + total_reading_incorrect
 
             total_meaning = (total_meaning_correct + total_meaning_incorrect)
             total_reading = (total_reading_correct + total_reading_incorrect)
-            total_reviews = total_meaning + total_reading
+            #total_reviews = total_meaning + total_reading
 
             total_kanji_correct = kanji_reading_correct + kanji_meaning_correct
             total_vocab_correct = vocab_reading_correct + vocab_meaning_correct
@@ -313,8 +315,8 @@ def get_reviews(review_path, api_url):
             meaning_accuracy = get_accuracy_total(total_meaning_correct, total_meaning)
             reading_accuracy = get_accuracy_total(total_reading_correct, total_reading)
 
-            total_answers += (total_reading + total_meaning)
-            total_reviews += (total_correct + total_incorrect)
+            total_answers = (total_reading + total_meaning)
+            total_reviews = (total_correct + total_incorrect)
             daily_reviews += 1
 
             # Checks if the next level is, well, the next one
@@ -343,6 +345,9 @@ def load_files(load_type):
         load_files("download")
 
 if __name__ == "__main__":
+    if (api_V2 == ""):
+        print("Error! API key not entered. Get your v2 key from here: https://www.wanikani.com/settings/personal_access_tokens")
+        quit()
     start = time.time()
     load_files("initial")
     end = time.time()
