@@ -127,13 +127,21 @@ def get_reviews(review_path, api_url):
 
     radical_meaning_correct = radical_meaning_incorrect = 0
     radical_accuracy = 0
+    radical_total = 0
+    radical_fails = 0
 
     kanji_meaning_correct = kanji_meaning_incorrect = kanji_reading_correct = kanji_reading_incorrect = 0
     kanji_accuracy = 0
+    kanji_total = 0
+    kanji_reading_fails = 0
+    kanji_meaning_fails = 0
     kanji_guruplus = 0
 
     vocab_meaning_correct = vocab_meaning_incorrect = vocab_reading_correct = vocab_reading_incorrect = 0
-    vocab_accuracy = 100
+    vocab_accuracy = 0
+    vocab_total = 0
+    vocab_reading_fails = 0
+    vocab_meaning_fails = 0
     vocab_guruplus = 0
 
     accuracy = 6
@@ -155,7 +163,7 @@ def get_reviews(review_path, api_url):
         total_active = DAYSTATS[1] + DAYSTATS[2] + DAYSTATS[3] + \
             DAYSTATS[4] + DAYSTATS[5] + DAYSTATS[6] + DAYSTATS[7] + DAYSTATS[8]
 
-        kanji_reading_acc = get_accuracy(
+        kanji_reading_acc = get_accuracy_total(
             kanji_reading_correct, kanji_reading_incorrect)
         kanji_meaning_acc = get_accuracy(
             kanji_meaning_correct, kanji_meaning_incorrect)
@@ -247,13 +255,18 @@ def get_reviews(review_path, api_url):
             if (subject_type == 'radical'):
                 radical_meaning_correct += meaning_correct
                 radical_meaning_incorrect += incorrect_meaning_answers
+                radical_total += 1
+                radical_fails += 0 if incorrect_meaning_answers == 0 else 1
 
             # Calculate kanji accuracies and update total and daily review counts
             elif (subject_type == 'kanji'):
                 kanji_meaning_correct += meaning_correct
                 kanji_meaning_incorrect += incorrect_meaning_answers
                 kanji_reading_correct += reading_correct
-                kanji_reading_incorrect += incorrect_meaning_answers
+                kanji_reading_incorrect += incorrect_reading_answers
+                kanji_total += 1
+                kanji_reading_fails += 0 if incorrect_reading_answers == 0 else 1
+                kanji_meaning_fails += 0 if incorrect_meaning_answers == 0 else 1
 
                 # Increase guruplus if level up to 5 happens
                 if (ending_srs_stage == 5 and starting_srs_stage == 4):
@@ -266,7 +279,11 @@ def get_reviews(review_path, api_url):
                 vocab_meaning_correct += meaning_correct
                 vocab_meaning_incorrect += incorrect_meaning_answers
                 vocab_reading_correct += reading_correct
-                vocab_reading_incorrect += incorrect_meaning_answers
+                vocab_reading_incorrect += incorrect_reading_answers
+                vocab_total += 1
+                vocab_reading_fails += 0 if incorrect_reading_answers == 0 else 1
+                vocab_meaning_fails += 0 if incorrect_meaning_answers == 0 else 1
+
                 # Increase guruplus if level up to 5 happens
                 if (ending_srs_stage == 5 and starting_srs_stage == 4):
                     vocab_guruplus += 1
