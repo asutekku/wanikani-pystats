@@ -136,6 +136,8 @@ def get_reviews(review_path, api_url):
     vocab_accuracy = 100
     vocab_guruplus = 0
 
+    accuracy = 6
+
     # Uncomment these if you want to write reviews to a file
     #f = open(review_path, "w")
     # Write the header
@@ -172,16 +174,16 @@ def get_reviews(review_path, api_url):
             'burned': DAYSTATS[9],
             'total_active': total_active,
             'total_items': total_active + DAYSTATS[9],
-            'kanji_reading_acc': str(round(kanji_reading_acc, 2)),
-            'kanji_meaning_acc': str(round(kanji_meaning_acc, 2)),
-            'vocab_reading_acc': str(round(vocab_reading_acc, 2)),
-            'vocab_meaning_acc': str(round(vocab_meaning_acc, 2)),
-            'radical_acc': str(round(radical_accuracy, 2)),
-            'kanji_acc': str(round(kanji_accuracy, 2)),
-            'vocab_acc': str(round(vocab_accuracy, 2)),
-            'reading_acc': str(round(reading_accuracy, 2)),
-            'meaning_acc': str(round(meaning_accuracy, 2)),
-            'total_acc': str(round(total_accuracy, 2)),
+            'kanji_reading_acc': str(round(kanji_reading_acc, accuracy)),
+            'kanji_meaning_acc': str(round(kanji_meaning_acc, accuracy)),
+            'vocab_reading_acc': str(round(vocab_reading_acc, accuracy)),
+            'vocab_meaning_acc': str(round(vocab_meaning_acc, accuracy)),
+            'radical_acc': str(round(radical_accuracy, accuracy)),
+            'kanji_acc': str(round(kanji_accuracy, accuracy)),
+            'vocab_acc': str(round(vocab_accuracy, accuracy)),
+            'reading_acc': str(round(reading_accuracy, accuracy)),
+            'meaning_acc': str(round(meaning_accuracy, accuracy)),
+            'total_acc': str(round(total_accuracy, accuracy)),
             'total_reading_Reviews': total_reading,
             'total_incorrect_Readings': total_reading_incorrect,
             'total_meaning_Reviews': total_meaning,
@@ -238,9 +240,8 @@ def get_reviews(review_path, api_url):
                 # Reset daily review values
                 daily_reviews = 0
 
-            meaning_correct = 1 if incorrect_meaning_answers == 0 else 0
-            reading_correct = 0 if subject_type == 'radical' else (
-                1 if incorrect_reading_answers == 0 else 0)
+            meaning_correct = 1 
+            reading_correct = 0 if subject_type == 'radical' else 1
 
             # Calculate radical accuracies and update total and daily review counts
             if (subject_type == 'radical'):
@@ -303,7 +304,6 @@ def get_reviews(review_path, api_url):
 
             total_meaning = (total_meaning_correct + total_meaning_incorrect)
             total_reading = (total_reading_correct + total_reading_incorrect)
-            #total_reviews = total_meaning + total_reading
 
             total_kanji_correct = kanji_reading_correct + kanji_meaning_correct
             total_vocab_correct = vocab_reading_correct + vocab_meaning_correct
