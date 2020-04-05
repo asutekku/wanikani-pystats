@@ -163,7 +163,8 @@ def get_reviews(review_path, api_url):
         total_active = DAYSTATS[1] + DAYSTATS[2] + DAYSTATS[3] + \
             DAYSTATS[4] + DAYSTATS[5] + DAYSTATS[6] + DAYSTATS[7] + DAYSTATS[8]
 
-        kanji_reading_acc = get_accuracy_total(
+        #print(f"Kanji r correct: {kanji_reading_correct} & kanji r incorrect: {kanji_reading_incorrect}")
+        kanji_reading_acc = get_accuracy(
             kanji_reading_correct, kanji_reading_incorrect)
         kanji_meaning_acc = get_accuracy(
             kanji_meaning_correct, kanji_meaning_incorrect)
@@ -262,8 +263,12 @@ def get_reviews(review_path, api_url):
             elif (subject_type == 'kanji'):
                 kanji_meaning_correct += meaning_correct
                 kanji_meaning_incorrect += incorrect_meaning_answers
+
+                #print(f"Kanji correct: {reading_correct} & kanji incorrect {incorrect_reading_answers}")
+
                 kanji_reading_correct += reading_correct
                 kanji_reading_incorrect += incorrect_reading_answers
+
                 kanji_total += 1
                 kanji_reading_fails += 0 if incorrect_reading_answers == 0 else 1
                 kanji_meaning_fails += 0 if incorrect_meaning_answers == 0 else 1
@@ -278,8 +283,10 @@ def get_reviews(review_path, api_url):
             elif (subject_type == 'vocabulary'):
                 vocab_meaning_correct += meaning_correct
                 vocab_meaning_incorrect += incorrect_meaning_answers
+
                 vocab_reading_correct += reading_correct
                 vocab_reading_incorrect += incorrect_reading_answers
+
                 vocab_total += 1
                 vocab_reading_fails += 0 if incorrect_reading_answers == 0 else 1
                 vocab_meaning_fails += 0 if incorrect_meaning_answers == 0 else 1
